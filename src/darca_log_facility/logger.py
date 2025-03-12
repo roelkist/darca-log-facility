@@ -33,7 +33,8 @@ class JSONFormatter(logging.Formatter):
 
 
 class DarcaLogger:
-    """A configurable logging manager for consistent logging across applications."""
+    """A configurable logging manager for consistent logging across
+    applications."""
 
     _instances = {}  # Singleton pattern to avoid duplicate loggers
 
@@ -107,7 +108,8 @@ class DarcaLogger:
         console_handler = logging.StreamHandler(sys.stdout)
         if colored_console and COLORLOG_AVAILABLE:
             console_formatter = ColoredFormatter(
-                "%(log_color)s%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                "%(log_color)s%(asctime)s - %(name)s - "
+                "%(levelname)s - %(message)s",
                 log_colors={
                     "DEBUG": "cyan",
                     "INFO": "green",
