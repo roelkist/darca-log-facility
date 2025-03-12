@@ -1,0 +1,55 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "darca-file-utils"
+version = "0.1.0"
+description = "A utility package for file, directory and YAML operations."
+readme = "README.md"
+requires-python = ">=3.7"
+license = { file = "LICENSE" }
+authors = [
+  { name = "roelkist", email = "roel.kist@example.com" }
+]
+keywords = ["file", "directory", "yaml", "utilities"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+dependencies = [
+  "pyyaml",
+  "click"
+]
+
+[project.urls]
+Homepage = "https://github.com/roelkist/darca-file-utils"
+Repository = "https://github.com/roelkist/darca-file-utils"
+Documentation = "https://github.com/roelkist/darca-file-utils/docs"
+
+[tool.setuptools.packages.find]
+where = ["src/"]
+exclude = ["tests"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--strict-markers"
+testpaths = [
+  "tests"
+]
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
+pytest-cov = "^4.0"
+flake8 = "^6.0"
+black = "^23.3"
+mypy = "^1.0"
+pre-commit = "^3.0"
+isort = "^5.12"
+bandit = "^1.7"
+safety = "^2.3"
+pip-audit = "^1.1"

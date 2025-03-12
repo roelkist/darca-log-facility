@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Run all checks
+        run: make ci
+
+
+      - name: Save mypy cache
+        id: cache-mypy-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .mypy_cache
+          key: ${{ runner.os }}-py${{ matrix.python-versions }}-mypy-${{ hashFiles('**/.mypy_cache') }}
+
+      - name: Codecov
+        uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
+          verbose: true
