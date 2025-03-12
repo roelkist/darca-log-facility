@@ -1,73 +1,183 @@
-Darca File Utils
-================
+==================================
+Darca Log Facility
+==================================
 
-Darca File Utils is a Python package that provides a comprehensive suite of utilities for managing
-files, directories, and YAML configurations. It is designed to be modular, easy to integrate, and
-suitable for both simple scripting and complex application development.
+Darca Log Facility is a powerful, flexible, and structured logging utility for Python applications.
+It provides configurable logging to both console and file, supports log rotation, and allows 
+optional JSON formatting for structured logging.
 
 Features
 --------
 
-- **Directory Operations:** Check existence, create, list, remove, rename, move, and copy directories.
-- **File Operations:** Check existence, read, write, remove, rename, move, and copy files.
-- **YAML Operations:** Load from and write to YAML files with robust error handling.
-
-License
--------
-
-This project is licensed under the MIT License. See the ``LICENSE`` file for details.
-
-Project Home
-------------
-
-- GitHub Repository: https://github.com/roelkist/darca-file-utils
+- **Configurable logging levels** (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+- **File & Console Logging** (with log rotation to prevent excessive file sizes).
+- **JSON Logging Format** (for structured logs, useful for log processors).
+- **Colored Console Output** (using `colorlog` for improved readability).
+- **Thread-safe Logging** (safe for multi-threaded applications).
+- **Dynamically Change Log Level** (without restarting the application).
 
 Installation
 ------------
 
-Install the runtime dependencies using:
+To install Darca Log Facility, first, clone the repository:
 
-.. code-block:: bash
+.. code-block:: sh
 
-   pip install -r requirements.txt
+    git clone https://github.com/roelkist/darca-log-facility.git
+    cd darca-log-facility
 
-For development (including testing, linting, and documentation), install additional requirements:
+Then install dependencies:
 
-.. code-block:: bash
+.. code-block:: sh
 
-   pip install -r requirements-dev.txt
+    pip install -e .[dev]
+
+Makefile Usage
+--------------
+
+This project includes a `Makefile` to simplify common tasks.
+
+- **Format code**:
+
+  .. code-block:: sh
+
+      make format
+
+- **Run linting checks**:
+
+  .. code-block:: sh
+
+      make lint
+
+- **Run tests**:
+
+  .. code-block:: sh
+
+      make test
+
+- **Check requirements**:
+
+  .. code-block:: sh
+
+      make requirements
+
+- **Check if pre-commit hooks are up-to-date**:
+
+  .. code-block:: sh
+
+      make precommit
+
+- **Generate documentation**:
+
+  .. code-block:: sh
+
+      make docs
+
+- **Run all pre-push checks (format, lint, test, requirements, precommit)**:
+
+  .. code-block:: sh
+
+      make check
 
 Usage
 -----
 
-Import the modules into your project as needed:
+Basic usage example:
 
 .. code-block:: python
 
-   from directory_utils import DirectoryUtils
-   from file_utils import FileUtils
-   from yaml_utils import YamlUtils
+    from darca_log_facility.logger import DarcaLogger
+    import logging
 
-For detailed examples, please refer to the documentation files under the ``docs/`` directory,
-including the API Reference and Usage Guide.
+    # Initialize logger
+    logger = DarcaLogger(name="my_app", level=logging.INFO).get_logger()
 
-Development
------------
+    # Log messages
+    logger.debug("This is a debug message")
+    logger.info("This is an info message")
+    logger.warning("This is a warning message")
+    logger.error("This is an error message")
+    logger.critical("This is a critical message")
 
-- **Testing:** Run unit tests using ``pytest`` or via Tox.
-- **Linting & Formatting:** Code style is enforced with Flake8 and Black.
-- **Documentation:** Documentation can be generated using Sphinx by running:
-  
-  .. code-block:: bash
+File logging example:
 
-     tox -e docs
+.. code-block:: python
 
-Contributing
-------------
+    logger = DarcaLogger(name="file_logger", log_directory="logs", log_to_file=True).get_logger()
+    logger.info("This message will be written to a log file.")
 
-Contributions are welcome. Please see the CONTRIBUTING.rst file for more information.
+JSON logging example:
 
-Maintainers
------------
+.. code-block:: python
 
-For details on project maintainers, refer to the MAINTAINERS.rst file.
+    logger = DarcaLogger(name="json_logger", log_directory="logs", json_format=True).get_logger()
+    logger.info("This log is formatted as JSON.")
+
+Configuration Options
+---------------------
+
+DarcaLogger supports multiple configuration options:
+
++------------------+-----------------------------------------+---------------------------+
+| Parameter       | Description                             | Default Value             |
++==================+=========================================+===========================+
+| name            | Name of the logger                      | `"app"`                   |
++------------------+-----------------------------------------+---------------------------+
+| level           | Logging level (DEBUG, INFO, etc.)       | `logging.INFO`            |
++------------------+-----------------------------------------+---------------------------+
+| log_directory   | Directory to store log files            | `"logs"`                  |
++------------------+-----------------------------------------+---------------------------+
+| max_file_size   | Max size of a log file before rotating  | `5MB`                      |
++------------------+-----------------------------------------+---------------------------+
+| backup_count    | Number of rotated log files to keep     | `5`                       |
++------------------+-----------------------------------------+---------------------------+
+| json_format     | Whether to format logs in JSON         | `False`                   |
++------------------+-----------------------------------------+---------------------------+
+
+Development and Contribution
+----------------------------
+
+We welcome contributions! Follow these steps to contribute:
+
+1. Fork the repository: https://github.com/roelkist/darca-log-facility
+2. Clone your forked repo:
+
+   .. code-block:: sh
+
+       git clone https://github.com/YOUR_USERNAME/darca-log-facility.git
+
+3. Install dependencies:
+
+   .. code-block:: sh
+
+       pip install -e .[dev]
+
+4. Run all checks before submitting code:
+
+   .. code-block:: sh
+
+       make check
+
+5. Submit a pull request.
+
+Testing
+-------
+
+Darca Log Facility uses `pytest` for testing. To run the test suite, use:
+
+.. code-block:: sh
+
+    make test
+
+License
+-------
+
+This project is licensed under the MIT License.
+
+Contact
+-------
+
+- **GitHub Repository:** https://github.com/roelkist/darca-log-facility
+- **Issues & Bug Reports:** https://github.com/roelkist/darca-log-facility/issues
+
+Enjoy using Darca Log Facility! 🚀
