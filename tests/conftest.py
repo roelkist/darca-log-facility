@@ -8,7 +8,7 @@ import pytest
 
 @pytest.fixture(scope="function")
 def temp_log_dir():
-    """Creates an isolated temporary log directory for each test and 
+    """Creates an isolated temporary log directory for each test and
     cleans up afterward."""
     log_dir = tempfile.mkdtemp(
         prefix="darca_logs_"
