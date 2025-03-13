@@ -1,19 +1,18 @@
 import logging
 import os
 import shutil
+import tempfile
 
 import pytest
 
 
 @pytest.fixture(scope="function")
 def temp_log_dir():
-    """Ensures log directory exists and cleans it up after tests."""
-    log_dir = "/tmp/temp_logs"
-
-    # Recreate the directory for every test to ensure consistency
-    if os.path.exists(log_dir):
-        shutil.rmtree(log_dir)
-    os.makedirs(log_dir, exist_ok=True)
+    """Creates an isolated temporary log directory for each test and 
+    cleans up afterward."""
+    log_dir = tempfile.mkdtemp(
+        prefix="darca_logs_"
+    )  # Create a unique temp dir for each test
 
     yield log_dir  # Provide the directory to the test
 
@@ -24,6 +23,6 @@ def temp_log_dir():
             handler.close()
             logger.removeHandler(handler)
 
-    # Cleanup directory safely
+    # Ensure cleanup after tests
     if os.path.exists(log_dir):
         shutil.rmtree(log_dir)
