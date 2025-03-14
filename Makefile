@@ -7,6 +7,10 @@ all: test
 format:
 	tox -e format
 
+# Update the pipenv requirements
+update_requirements:
+	tox -e update_requirements
+
 # Linting using pre-commit (flake8, black, isort, bandit) via tox
 lint:
 	tox -e lint
@@ -28,5 +32,5 @@ docs:
 	tox -e docs
 
 # Run all checks before pushing code (format, lint, test, requirements, precommit)
-check: format lint test requirements precommit
-ci: precommit lint test 
+check: precommit update_requirements format lint test 
+ci: precommit requirements lint test 
