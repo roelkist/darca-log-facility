@@ -27,3 +27,9 @@ jobs:
       - name: Run all checks
         run: make ci
 
+      - name: Upload Coverage Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov/
+

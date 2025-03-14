@@ -12,23 +12,18 @@ isort = "==6.0.1"
 pytest = "*"
 pytest-cov = "*"
 pytest-xdist = "*"
-
 # Linting & Code Formatting
 flake8 = "*"
 black = "*"
 isort = "*"
 ruff = "*"
-
 # Security
 bandit = "*"
-
 # Type Checking
 mypy = "*"
 mypy-extensions = "*"
-
 # Pre-commit hooks
 pre-commit = "*"
-
 # Documentation
 sphinx = "*"
 sphinx-rtd-theme = "*"
@@ -40,6 +35,7 @@ sphinxcontrib-jsmath = "*"
 sphinxcontrib-plantuml = "*"
 sphinxcontrib-qthelp = "*"
 sphinxcontrib-serializinghtml = "*"
+coverage-badge = "*"
 
 [requires]
 python_version = "3.12"
