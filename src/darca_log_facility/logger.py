@@ -6,8 +6,9 @@ import sys
 from datetime import datetime
 
 try:
-    from colorlog import \
-        ColoredFormatter  # Optional: Enhances console output readability
+    from colorlog import (
+        ColoredFormatter,  # Optional: Enhances console output readability
+    )
 
     COLORLOG_AVAILABLE = True
 except ImportError:
@@ -70,15 +71,21 @@ class DarcaLogger:
         )
 
         if log_to_file:
-            self._setup_file_logging(name, log_directory, max_file_size, backup_count)
+            self._setup_file_logging(
+                name, log_directory, max_file_size, backup_count
+            )
 
         if log_to_console:
             self._setup_console_logging(colored_console)
 
-    def _setup_file_logging(self, name, log_directory, max_file_size, backup_count):
+    def _setup_file_logging(
+        self, name, log_directory, max_file_size, backup_count
+    ):
         """Setup file logging with rotation."""
         if not os.path.exists(log_directory):
-            os.makedirs(log_directory, exist_ok=True)  # Ensure directory exists
+            os.makedirs(
+                log_directory, exist_ok=True
+            )  # Ensure directory exists
 
         log_file_path = os.path.join(log_directory, f"{name}.log")
 
@@ -92,14 +99,17 @@ class DarcaLogger:
         self.logger.addHandler(file_handler)
 
         # Debugging log to check if file is created
-        self.logger.info(f"Logger initialized. Writing logs to {log_file_path}")
+        self.logger.info(
+            f"Logger initialized. Writing logs to {log_file_path}"
+        )
 
     def _setup_console_logging(self, colored_console):
         """Setup console logging with optional color support."""
         console_handler = logging.StreamHandler(sys.stdout)
         if colored_console and COLORLOG_AVAILABLE:
             console_formatter = ColoredFormatter(
-                "%(log_color)s%(asctime)s - %(name)s - " "%(levelname)s - %(message)s",
+                "%(log_color)s%(asctime)s - %(name)s - "
+                "%(levelname)s - %(message)s",
                 log_colors={
                     "DEBUG": "cyan",
                     "INFO": "green",

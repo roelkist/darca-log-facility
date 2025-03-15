@@ -9,47 +9,29 @@ repos:
     files: 'src/darca_log_facility/'
   - id: check-yaml
     files: '.github/'
+
 - repo: https://github.com/pycqa/flake8
   rev: '7.1.2'
   hooks:
   - id: flake8
     args: ["--max-line-length=79"]
+
 - repo: https://github.com/PyCQA/isort
   rev: '6.0.1'
   hooks:
   - id: isort
     args: [-l79, --profile, black, --check, --diff]
+
 - repo: https://github.com/psf/black
   rev: '25.1.0'
   hooks:
   - id: black
     args: [-l79, --check, --diff, .]
+
 - repo: https://github.com/PyCQA/bandit
   rev: '1.8.3'
   hooks:
   - id: bandit
     args: ["-r", "src/darca_log_facility/"]
     exclude: tests
-- repo: local
-  hooks:
-    - id: tox-requirements
-      name: run requirements check from tox
-      description: Checks if `make requirements` is up-to-date
-      entry: tox -e requirements
-      language: system
-      pass_filenames: false
-      verbose: true
-    - id: tox-mypy
-      name: run typing check from tox
-      description: Checks typing with `mypy`
-      entry: tox -e typing
-      language: system
-      pass_filenames: false
-      verbose: true
-    - id: tox-precommit
-      name: run pre-commit version check from tox
-      description: Checks if `pre-commit autoupdate` is up-to-date
-      entry: tox -e precommit
-      language: system
-      pass_filenames: false
-      verbose: true
+

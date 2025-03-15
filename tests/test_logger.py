@@ -18,7 +18,9 @@ def logger_instance(temp_log_dir, request):
 def test_logger_creation(logger_instance, request):
     """Ensure DarcaLogger initializes correctly."""
     logger = logger_instance.get_logger()
-    expected_logger_name = request.node.name  # Logger name should match the test name
+    expected_logger_name = (
+        request.node.name
+    )  # Logger name should match the test name
     assert (
         logger.name == expected_logger_name
     ), f"Expected logger name '{expected_logger_name}', got '{logger.name}'"
@@ -40,7 +42,9 @@ def test_logging_levels(logger_instance, temp_log_dir):
             break
         time.sleep(0.1)
 
-    assert os.path.exists(log_file_path), f"Log file does not exist: {log_file_path}"
+    assert os.path.exists(
+        log_file_path
+    ), f"Log file does not exist: {log_file_path}"
 
     rotated_file_path = os.path.join(temp_log_dir, "test_log_rotation.log.2")
     if os.path.exists(rotated_file_path):
@@ -68,7 +72,9 @@ def test_log_file_creation(logger_instance, temp_log_dir, request):
             break
         time.sleep(0.1)
 
-    assert os.path.exists(log_file_path), f"Log file was not created: {log_file_path}"
+    assert os.path.exists(
+        log_file_path
+    ), f"Log file was not created: {log_file_path}"
 
     with open(log_file_path, "r", encoding="utf-8") as f:
         log_content = f.read()
@@ -90,7 +96,9 @@ def test_log_rotation(temp_log_dir, request):
 
     # Generate logs to exceed the file size and trigger rotation
     for _ in range(100):  # More iterations to ensure rotation triggers
-        logger.info("This is a long log message to exceed the file size limit.")
+        logger.info(
+            "This is a long log message to exceed the file size limit."
+        )
 
     # Ensure all logs are flushed to file
     for handler in logger.handlers:
@@ -102,16 +110,22 @@ def test_log_rotation(temp_log_dir, request):
             break
         time.sleep(0.1)
 
-    assert os.path.exists(log_file_path), f"Log file does not exist: {log_file_path}"
+    assert os.path.exists(
+        log_file_path
+    ), f"Log file does not exist: {log_file_path}"
 
     # Check that rotated log files exist
     rotated_files = [f for f in os.listdir(temp_log_dir) if log_name in f]
-    assert len(rotated_files) > 1, f"Log rotation did not happen for {log_name}"
+    assert (
+        len(rotated_files) > 1
+    ), f"Log rotation did not happen for {log_name}"
 
     # Verify specific rotated files exist
     for i in range(1, 3):  # Checking for .1 and .2 rotated files
         rotated_file = os.path.join(temp_log_dir, f"{log_name}.log.{i}")
-        assert os.path.exists(rotated_file), f"Rotated log file missing: {rotated_file}"
+        assert os.path.exists(
+            rotated_file
+        ), f"Rotated log file missing: {rotated_file}"
 
 
 def test_json_logging(temp_log_dir, request):
@@ -176,7 +190,9 @@ def test_dynamic_log_level_change(logger_instance, temp_log_dir, request):
             break
         time.sleep(0.1)
 
-    assert os.path.exists(log_file_path), f"Log file does not exist: {log_file_path}"
+    assert os.path.exists(
+        log_file_path
+    ), f"Log file does not exist: {log_file_path}"
 
     with open(log_file_path, "r", encoding="utf-8") as f:
         log_content = f.read()

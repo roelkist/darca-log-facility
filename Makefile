@@ -22,6 +22,13 @@ RUN_POETRY = POETRY_CONFIG_DIR=$(POETRY_CONFIG_DIR) \
              PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \
              $(POETRY_BIN)
 
+# Detect if running in CI (GitHub Actions)
+ifdef CI
+    PRE_COMMIT_CACHE := ~/.cache/pre-commit
+else
+    PRE_COMMIT_CACHE := /tmp/precommit-cache
+endif
+
 # Detect CI and use system Poetry when applicable
 ifeq ($(CI),true)
     RUN = poetry run
@@ -67,23 +74,23 @@ add-deps:
 	@$(RUN_POETRY) add --group $(group) $(deps)
 	@echo "✅ Dependencies added successfully!"
 
-# Run formatters
+# Run formatters (apply changes)
 format:
-	@echo "🎨 Formatting code..."
-	@$(RUN) black .
-	@$(RUN) isort .
+	@echo "🎨 Auto-formatting code..."
+	@$(RUN) isort -l79 --profile black .
+	@$(RUN) black -l79 .
 	@echo "✅ Formatting complete!"
 
-# Run linting (pre-commit hooks)
+# Run pre-commit hooks to check for issues (without fixing)
 precommit:
-	@echo "🔍 Running pre-commit hooks..."
-	@$(RUN) pre-commit run --all-files
-	@echo "✅ Pre-commit checks passed!"
+	@echo "🔍 Running pre-commit hooks (checks only)..."
+	@PRE_COMMIT_HOME=$(PRE_COMMIT_CACHE) $(RUN) pre-commit run --all-files --show-diff-on-failure
+	@echo "✅ Pre-commit checks completed!"
 
 # Run tests with pytest
 test:
 	@echo "🧪 Running tests..."
-	@$(RUN) pytest --cov-report=xml --cov-report=html --cov -n auto -vv tests/
+	@COVERAGE_FILE=/tmp/.coverage $(RUN) pytest --cov-report=xml --cov-report=html --cov -n auto -vv tests/
 	@echo "✅ Tests completed!"
 
 # Build documentation
