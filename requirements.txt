@@ -1,3 +1,0 @@
--i https://pypi.org/simple
-colorlog==6.9.0; python_version >= '3.6'
-isort==6.0.1; python_full_version >= '3.9.0'

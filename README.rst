@@ -2,6 +2,10 @@
 Darca Log Facility
 ==================================
 
+.. image:: coverage.svg
+   :alt: Test Coverage
+   :target: coverage.svg
+
 Darca Log Facility is a powerful, flexible, and structured logging utility for Python applications.
 It provides configurable logging to both console and file, supports log rotation, and allows 
 optional JSON formatting for structured logging.
@@ -26,11 +30,11 @@ To install Darca Log Facility, first, clone the repository:
     git clone https://github.com/roelkist/darca-log-facility.git
     cd darca-log-facility
 
-Then install dependencies:
+Then install dependencies using Poetry:
 
 .. code-block:: sh
 
-    pip install -e .[dev]
+    poetry install --with dev,docs
 
 Makefile Usage
 --------------
@@ -55,13 +59,7 @@ This project includes a `Makefile` to simplify common tasks.
 
       make test
 
-- **Check requirements**:
-
-  .. code-block:: sh
-
-      make requirements
-
-- **Check if pre-commit hooks are up-to-date**:
+- **Run pre-commit hooks**:
 
   .. code-block:: sh
 
@@ -73,11 +71,17 @@ This project includes a `Makefile` to simplify common tasks.
 
       make docs
 
-- **Run all pre-push checks (format, lint, test, requirements, precommit)**:
+- **Run all pre-push checks (format, lint, test, precommit)**:
 
   .. code-block:: sh
 
       make check
+
+- **Run full CI pipeline (precommit, lint, test)**:
+
+  .. code-block:: sh
+
+      make ci
 
 Usage
 -----
@@ -127,7 +131,7 @@ DarcaLogger supports multiple configuration options:
 +------------------+-----------------------------------------+---------------------------+
 | log_directory   | Directory to store log files            | `"logs"`                  |
 +------------------+-----------------------------------------+---------------------------+
-| max_file_size   | Max size of a log file before rotating  | `5MB`                      |
+| max_file_size   | Max size of a log file before rotating  | `5MB`                     |
 +------------------+-----------------------------------------+---------------------------+
 | backup_count    | Number of rotated log files to keep     | `5`                       |
 +------------------+-----------------------------------------+---------------------------+
@@ -146,11 +150,11 @@ We welcome contributions! Follow these steps to contribute:
 
        git clone https://github.com/YOUR_USERNAME/darca-log-facility.git
 
-3. Install dependencies:
+3. Install dependencies using Poetry:
 
    .. code-block:: sh
 
-       pip install -e .[dev]
+       poetry install --with dev,docs
 
 4. Run all checks before submitting code:
 
@@ -168,6 +172,23 @@ Darca Log Facility uses `pytest` for testing. To run the test suite, use:
 .. code-block:: sh
 
     make test
+
+Continuous Integration (CI)
+===========================
+
+GitHub Actions runs the following pipeline automatically:
+
+- **Pre-commit hooks**: `make precommit`
+- **Linting**: `make lint`
+- **Testing with coverage**: `make test`
+- **Documentation build**: `make docs`
+- **Coverage and documentation artifacts are uploaded**
+
+Run the full pipeline locally with:
+
+.. code-block:: bash
+
+    make ci
 
 License
 -------
