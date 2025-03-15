@@ -31,30 +31,34 @@ else
     INSTALL_CMD = $(RUN_POETRY) install --no-cache --with dev,docs --no-interaction
 endif
 
-# Ensure virtual environment exists and Poetry is installed
+# Ensure virtual environment exists and Poetry is installed (only locally)
+ifeq ($(CI),false)  # Skip this in GitHub Actions
 $(VENV_PATH):
-	@if [ -z "$$CI" ]; then \
-		echo "📦 Creating virtual environment in $(VENV_PATH)..."; \
-		python3 -m venv $(VENV_PATH); \
-		$(VENV_PATH)/bin/pip install pipx; \
-		$(VENV_PATH)/bin/pipx install poetry; \
-		echo "✅ Virtual environment ready with Poetry!"; \
-	fi
+	@echo "📦 Creating virtual environment in $(VENV_PATH)..."
+	python3 -m venv $(VENV_PATH)
+	$(VENV_PATH)/bin/pip install pipx
+	$(VENV_PATH)/bin/pipx install poetry
+	@echo "✅ Virtual environment ready with Poetry!"
 
-# Ensure Poetry is available
 $(POETRY_BIN): $(VENV_PATH)
 	@if [ ! -f "$(POETRY_BIN)" ]; then \
 		echo "🚀 Installing Poetry inside the virtual environment..."; \
 		$(VENV_PATH)/bin/pipx install poetry; \
 	fi
+endif
 
 # Install project dependencies
-install: $(VENV_PATH) $(POETRY_BIN)
-	@echo "📦 Installing dependencies..."
+install:
+ifeq ($(CI),true)
+	@echo "🤖 Running inside GitHub Actions - Using system Poetry..."
+	poetry install --no-cache --with dev,docs --no-interaction
+else
+	@echo "📦 Installing dependencies using Poetry..."
 	@$(INSTALL_CMD)
+endif
 
 # 🔥 Generic make target for adding dependencies dynamically
-add-deps: $(VENV_PATH) $(POETRY_BIN)
+add-deps:
 	@if [ -z "$(group)" ] || [ -z "$(deps)" ]; then \
 		echo "❌ Usage: make add-deps group=<group-name> deps='<package1> <package2>'"; \
 		exit 1; \
@@ -64,26 +68,26 @@ add-deps: $(VENV_PATH) $(POETRY_BIN)
 	@echo "✅ Dependencies added successfully!"
 
 # Run formatters
-format: $(VENV_PATH) $(POETRY_BIN)
+format:
 	@echo "🎨 Formatting code..."
 	@$(RUN) black .
 	@$(RUN) isort .
 	@echo "✅ Formatting complete!"
 
 # Run linting (pre-commit hooks)
-precommit: $(VENV_PATH) $(POETRY_BIN)
+precommit:
 	@echo "🔍 Running pre-commit hooks..."
 	@$(RUN) pre-commit run --all-files
 	@echo "✅ Pre-commit checks passed!"
 
 # Run tests with pytest
-test: $(VENV_PATH) $(POETRY_BIN)
+test:
 	@echo "🧪 Running tests..."
 	@$(RUN) pytest --cov-report=xml --cov-report=html --cov -n auto -vv tests/
 	@echo "✅ Tests completed!"
 
 # Build documentation
-docs: $(VENV_PATH) $(POETRY_BIN)
+docs:
 	@echo "📖 Building documentation..."
 	@$(RUN) sphinx-build -E -W -b html docs/source docs/build/html
 	@echo "✅ Documentation built!"
