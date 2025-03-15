@@ -87,11 +87,17 @@ precommit:
 	@PRE_COMMIT_HOME=$(PRE_COMMIT_CACHE) $(RUN) pre-commit run --all-files --show-diff-on-failure
 	@echo "✅ Pre-commit checks completed!"
 
-# Run tests with pytest
+# Run tests with pytest and generate coverage badge
 test:
 	@echo "🧪 Running tests..."
 	@COVERAGE_FILE=/tmp/.coverage $(RUN) pytest --cov-report=xml --cov-report=html --cov -n auto -vv tests/
 	@echo "✅ Tests completed!"
+	
+	@echo "📊 Generating coverage badge..."
+	@COVERAGE_FILE=/tmp/.coverage $(RUN) coverage json  # Ensure coverage data exists
+	@COVERAGE_FILE=/tmp/.coverage $(RUN) coverage-badge -o coverage.svg -f
+	@rm -f coverage.json  # Clean up
+	@echo "🏆 Coverage badge updated!"
 
 # Build documentation
 docs:
