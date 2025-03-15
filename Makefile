@@ -1,4 +1,4 @@
-SHELL := /bin/bash  # Ensure Makefile runs in Bash
+SHELL := /bin/bash  # Ensure Bash is used
 
 .SILENT:  # Suppress unnecessary make output
 
@@ -7,33 +7,31 @@ SHELL := /bin/bash  # Ensure Makefile runs in Bash
 # Store virtual environment and Poetry cache outside of NFS
 VENV_PATH := /tmp/darca-log-venv
 POETRY_HOME := /tmp/poetry-cache
-POETRY_CONFIG_DIR := /tmp/poetry-config  # Override global Poetry config
+POETRY_CONFIG_DIR := /tmp/poetry-config
 PYTHONPYCACHEPREFIX := /tmp/pycache
 
 # Define Poetry executable inside the virtual environment
 POETRY_BIN := $(VENV_PATH)/bin/poetry
 
-# Abstract the Poetry execution to always set the correct environment
-define POETRY_EXEC
-    POETRY_CONFIG_DIR=$(POETRY_CONFIG_DIR) \
-    POETRY_HOME=$(POETRY_HOME) \
-    POETRY_CACHE_DIR=$(POETRY_HOME) \
-    POETRY_VIRTUALENVS_PATH=$(VENV_PATH) \
-    PYTHONPYCACHEPREFIX=$(PYTHONPYCACHEPREFIX) \
-    PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \
-    $(POETRY_BIN) $(1)
-endef
+# Abstract Poetry execution with correct environment variables
+RUN_POETRY = POETRY_CONFIG_DIR=$(POETRY_CONFIG_DIR) \
+             POETRY_HOME=$(POETRY_HOME) \
+             POETRY_CACHE_DIR=$(POETRY_HOME) \
+             POETRY_VIRTUALENVS_PATH=$(VENV_PATH) \
+             PYTHONPYCACHEPREFIX=$(PYTHONPYCACHEPREFIX) \
+             PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \
+             $(POETRY_BIN)
 
-# Detect if running in CI (GitHub Actions)
-ifdef CI
+# Detect CI and use system Poetry when applicable
+ifeq ($(CI),true)
     RUN = poetry run
-    INSTALL_CMD = $(call POETRY_EXEC,install --no-cache --with dev,docs --no-interaction)
+    INSTALL_CMD = poetry install --no-cache --with dev,docs --no-interaction
 else
     RUN = $(POETRY_BIN) run
-    INSTALL_CMD = $(call POETRY_EXEC,install --no-cache --with dev,docs --no-interaction)
+    INSTALL_CMD = $(RUN_POETRY) install --no-cache --with dev,docs --no-interaction
 endif
 
-# Ensure the virtual environment exists and has Poetry installed
+# Ensure virtual environment exists and Poetry is installed
 $(VENV_PATH):
 	@if [ -z "$$CI" ]; then \
 		echo "📦 Creating virtual environment in $(VENV_PATH)..."; \
@@ -44,44 +42,35 @@ $(VENV_PATH):
 	fi
 
 # Ensure Poetry is available
-$(POETRY_BIN):
+$(POETRY_BIN): $(VENV_PATH)
 	@if [ ! -f "$(POETRY_BIN)" ]; then \
 		echo "🚀 Installing Poetry inside the virtual environment..."; \
 		$(VENV_PATH)/bin/pipx install poetry; \
 	fi
 
-# Install project dependencies using Poetry (inside the venv)
+# Install project dependencies
 install: $(VENV_PATH) $(POETRY_BIN)
-	@echo "📦 Configuring Poetry settings..."
-	@$(call POETRY_EXEC,config cache-dir $(POETRY_HOME))
-	@$(call POETRY_EXEC,config virtualenvs.path $(VENV_PATH))
-	@$(call POETRY_EXEC,config virtualenvs.in-project false)
-	@$(call POETRY_EXEC,config virtualenvs.create true)
-	@$(call POETRY_EXEC,config installer.parallel false)
-	@echo "✅ Poetry configured!"
-
 	@echo "📦 Installing dependencies..."
 	@$(INSTALL_CMD)
-	@echo "✅ Dependencies installed!"
 
-# 🔥 NEW: Generic make target for adding dependencies dynamically
+# 🔥 Generic make target for adding dependencies dynamically
 add-deps: $(VENV_PATH) $(POETRY_BIN)
 	@if [ -z "$(group)" ] || [ -z "$(deps)" ]; then \
 		echo "❌ Usage: make add-deps group=<group-name> deps='<package1> <package2>'"; \
 		exit 1; \
 	fi
 	@echo "🔄 Adding dependencies to group '$(group)': $(deps)"
-	@$(call POETRY_EXEC,add --group $(group) $(deps))
+	@$(RUN_POETRY) add --group $(group) $(deps)
 	@echo "✅ Dependencies added successfully!"
 
-# Run code formatters
+# Run formatters
 format: $(VENV_PATH) $(POETRY_BIN)
 	@echo "🎨 Formatting code..."
 	@$(RUN) black .
 	@$(RUN) isort .
 	@echo "✅ Formatting complete!"
 
-# Run linting
+# Run linting (pre-commit hooks)
 precommit: $(VENV_PATH) $(POETRY_BIN)
 	@echo "🔍 Running pre-commit hooks..."
 	@$(RUN) pre-commit run --all-files
@@ -99,15 +88,15 @@ docs: $(VENV_PATH) $(POETRY_BIN)
 	@$(RUN) sphinx-build -E -W -b html docs/source docs/build/html
 	@echo "✅ Documentation built!"
 
-# Run all checks before pushing code (Ensure formatting before precommit)
+# Run all checks before pushing code
 check: install format precommit test
 	@echo "✅ All checks passed!"
 
-# CI pipeline (Ensure formatting before precommit)
+# CI pipeline (format, precommit, test)
 ci: install precommit test
 	@echo "✅ CI checks completed!"
 
-# Remove the virtual environment (cleanup)
+# Cleanup virtual environment
 clean:
 	@echo "🗑 Removing virtual environment..."
 	@rm -rf $(VENV_PATH) $(POETRY_HOME) $(POETRY_CONFIG_DIR) $(PYTHONPYCACHEPREFIX)
