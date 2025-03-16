@@ -2,7 +2,7 @@ SHELL := /bin/bash  # Ensure Bash is used
 
 .SILENT:  # Suppress unnecessary make output
 
-.PHONY: all install add-deps format test precommit docs check ci clean
+.PHONY: all install add-deps format test precommit docs check ci clean venv poetry
 
 # Store virtual environment and Poetry cache outside of NFS
 VENV_PATH := /tmp/darca-log-venv
@@ -38,24 +38,25 @@ else
     INSTALL_CMD = $(RUN_POETRY) install --no-cache --with dev,docs --no-interaction
 endif
 
-# Ensure virtual environment exists and Poetry is installed (only locally)
-ifeq ($(CI),false)  # Skip this in GitHub Actions
-$(VENV_PATH):
-	@echo "📦 Creating virtual environment in $(VENV_PATH)..."
-	python3 -m venv $(VENV_PATH)
-	$(VENV_PATH)/bin/pip install pipx
-	$(VENV_PATH)/bin/pipx install poetry
-	@echo "✅ Virtual environment ready with Poetry!"
+# Ensure virtual environment exists before installing Poetry
+venv:
+	@if [ ! -d "$(VENV_PATH)" ]; then \
+		echo "📦 Creating virtual environment in $(VENV_PATH)..."; \
+		python3 -m venv $(VENV_PATH); \
+		$(VENV_PATH)/bin/pip install --quiet --upgrade pip; \
+		echo "✅ Virtual environment created!"; \
+	fi
 
-$(POETRY_BIN): $(VENV_PATH)
+# Ensure Poetry is installed **inside** the virtual environment
+poetry: venv
 	@if [ ! -f "$(POETRY_BIN)" ]; then \
 		echo "🚀 Installing Poetry inside the virtual environment..."; \
-		$(VENV_PATH)/bin/pipx install poetry; \
+		$(VENV_PATH)/bin/pip install --quiet poetry; \
+		echo "✅ Poetry installed successfully in $(VENV_PATH)!"; \
 	fi
-endif
 
-# Install project dependencies
-install:
+# Install project dependencies (ensuring Poetry is installed first)
+install: poetry
 ifeq ($(CI),true)
 	@echo "🤖 Running inside GitHub Actions - Using system Poetry..."
 	poetry install --no-cache --with dev,docs --no-interaction
@@ -87,17 +88,22 @@ precommit:
 	@PRE_COMMIT_HOME=$(PRE_COMMIT_CACHE) $(RUN) pre-commit run --all-files --show-diff-on-failure
 	@echo "✅ Pre-commit checks completed!"
 
-# Run tests with pytest and generate coverage badge
+# Run tests with pytest and generate coverage reports
 test:
 	@echo "🧪 Running tests..."
-	@COVERAGE_FILE=/tmp/.coverage $(RUN) pytest --cov-report=xml --cov-report=html --cov -n auto -vv tests/
+	@COVERAGE_FILE=/tmp/.coverage $(RUN) pytest --cov-report=xml --cov-report=html --cov-report=json --cov -n auto -vv tests/
 	@echo "✅ Tests completed!"
-	
+
 	@echo "📊 Generating coverage badge..."
-	@COVERAGE_FILE=/tmp/.coverage $(RUN) coverage json  # Ensure coverage data exists
-	@COVERAGE_FILE=/tmp/.coverage $(RUN) coverage-badge -o coverage.svg -f
-	@rm -f coverage.json  # Clean up
-	@echo "🏆 Coverage badge updated!"
+	@$(RUN) coverage-badge -o coverage.svg -f || echo "⚠️ Failed to generate badge"
+
+	@echo "📂 Storing coverage reports..."
+	@mkdir -p artifacts
+	@mv coverage.xml artifacts/ || echo "⚠️ No coverage.xml generated"
+	@mv coverage.json artifacts/ || echo "⚠️ No coverage.json generated"
+
+	@echo "✅ Coverage reports are stored in the 'artifacts' directory."
+
 
 # Build documentation
 docs:
