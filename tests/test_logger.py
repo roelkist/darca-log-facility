@@ -222,4 +222,3 @@ def test_colorlog_import_error(monkeypatch):
         logger.info("Fallback test message")
     except Exception as e:
         pytest.fail(f"Logger failed with missing colorlog: {e}")
-
