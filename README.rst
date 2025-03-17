@@ -6,6 +6,12 @@ Darca Log Facility
    :alt: Test Coverage
    :target: coverage.svg
 
+.. only:: html
+
+   .. image:: _static/coverage.svg
+      :alt: Test Coverage
+      :target: _static/coverage.svg
+
 Darca Log Facility is a powerful, flexible, and structured logging utility for Python applications.
 It provides configurable logging to both console and file, supports log rotation, and allows 
 optional JSON formatting for structured logging.
@@ -122,21 +128,22 @@ Configuration Options
 
 DarcaLogger supports multiple configuration options:
 
-+------------------+-----------------------------------------+---------------------------+
-| Parameter       | Description                             | Default Value             |
-+==================+=========================================+===========================+
-| name            | Name of the logger                      | `"app"`                   |
-+------------------+-----------------------------------------+---------------------------+
-| level           | Logging level (DEBUG, INFO, etc.)       | `logging.INFO`            |
-+------------------+-----------------------------------------+---------------------------+
-| log_directory   | Directory to store log files            | `"logs"`                  |
-+------------------+-----------------------------------------+---------------------------+
-| max_file_size   | Max size of a log file before rotating  | `5MB`                     |
-+------------------+-----------------------------------------+---------------------------+
-| backup_count    | Number of rotated log files to keep     | `5`                       |
-+------------------+-----------------------------------------+---------------------------+
-| json_format     | Whether to format logs in JSON         | `False`                   |
-+------------------+-----------------------------------------+---------------------------+
++--------------+----------------------------------------+------------------+
+| Parameter    | Description                            | Default Value    |
++==============+========================================+==================+
+| name         | Name of the logger                     | ``"app"``        |
++--------------+----------------------------------------+------------------+
+| level        | Logging level (DEBUG, INFO, etc.)      | ``logging.INFO`` |
++--------------+----------------------------------------+------------------+
+| log_directory| Directory to store log files           | ``"logs"``       |
++--------------+----------------------------------------+------------------+
+| max_file_size| Max size of a log file before rotating | ``5MB``          |
++--------------+----------------------------------------+------------------+
+| backup_count | Number of rotated log files to keep    | ``5``            |
++--------------+----------------------------------------+------------------+
+| json_format  | Whether to format logs in JSON         | ``False``        |
++--------------+----------------------------------------+------------------+
+
 
 Development and Contribution
 ----------------------------

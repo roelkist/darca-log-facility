@@ -83,7 +83,7 @@ add-prod-deps:
 	@echo "🔄 Adding production dependencies: $(deps)"
 	@$(RUN_POETRY) add $(deps)
 	@echo "✅ Dependencies added successfully!"
-	
+
 # Run formatters (apply changes)
 format:
 	@echo "🎨 Auto-formatting code..."
@@ -100,10 +100,15 @@ precommit:
 # Run tests with pytest and generate an HTML coverage report
 test:
 	@echo "🧪 Running tests..."
-	@COVERAGE_FILE=/tmp/.coverage $(RUN) pytest --cov=src --cov-report=html -n auto -vv tests/
+	@COVERAGE_FILE=/tmp/.coverage $(RUN) pytest --cov=src \
+		--cov-report=html \
+		--cov-report=term \
+		--cov-report=json:coverage.json \
+		-n auto -vv tests/
 	@echo "📊 Generating coverage badge..."
 	@COVERAGE_FILE=/tmp/.coverage $(RUN) coverage-badge -o coverage.svg -f
-	@echo "✅ Tests completed, and coverage badge generated!"
+	@cp coverage.svg docs/source/_static/.
+	@echo "✅ Tests completed, coverage report saved as coverage.json!"
 
 # Build documentation
 docs:

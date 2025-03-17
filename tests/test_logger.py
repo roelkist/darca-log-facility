@@ -204,16 +204,22 @@ def test_logger_singleton():
 def test_colorlog_import_error(monkeypatch):
     """Simulate missing colorlog package to test fallback behavior."""
 
+    # Remove colorlog from sys.modules if it was already imported
+    monkeypatch.delattr("sys.modules['colorlog']", raising=False)
+
     # Prevent `colorlog` from being imported
-    monkeypatch.setattr(
-        "builtins.__import__",
-        lambda name, *args: (
-            None if name == "colorlog" else __import__(name, *args)
-        ),
-    )
+    original_import = __import__
+
+    def mock_import(name, *args, **kwargs):
+        if name == "colorlog":
+            raise ImportError("Simulated missing colorlog")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.__import__", mock_import)
 
     try:
         logger = DarcaLogger(name="fallback_logger").get_logger()
         logger.info("Fallback test message")
     except Exception as e:
         pytest.fail(f"Logger failed with missing colorlog: {e}")
+
