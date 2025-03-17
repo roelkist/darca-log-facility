@@ -121,7 +121,7 @@ check: install format precommit test
 	@echo "✅ All checks passed!"
 
 # CI pipeline (format, precommit, test)
-ci: install precommit test
+ci: install precommit test docs
 	@echo "✅ CI checks completed!"
 
 # Cleanup virtual environment
