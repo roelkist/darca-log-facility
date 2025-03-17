@@ -8,6 +8,7 @@ readme = "README.rst"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+colorlog = "^6.9.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -34,6 +35,7 @@ sphinxcontrib-jsmath = "^1.0.1"
 sphinxcontrib-qthelp = "^2.0.0"
 sphinxcontrib-serializinghtml = "^2.0.0"
 sphinxcontrib-plantuml = "^0.30"
+
 
 [build-system]
 requires = ["poetry-core"]

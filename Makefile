@@ -75,6 +75,15 @@ add-deps:
 	@$(RUN_POETRY) add --group $(group) $(deps)
 	@echo "✅ Dependencies added successfully!"
 
+add-prod-deps:
+	@if [ -z "$(deps)" ]; then \
+		echo "❌ Usage: make add-prod-deps deps='<package1> <package2>'"; \
+		exit 1; \
+	fi
+	@echo "🔄 Adding production dependencies: $(deps)"
+	@$(RUN_POETRY) add $(deps)
+	@echo "✅ Dependencies added successfully!"
+	
 # Run formatters (apply changes)
 format:
 	@echo "🎨 Auto-formatting code..."
@@ -88,22 +97,13 @@ precommit:
 	@PRE_COMMIT_HOME=$(PRE_COMMIT_CACHE) $(RUN) pre-commit run --all-files --show-diff-on-failure
 	@echo "✅ Pre-commit checks completed!"
 
-# Run tests with pytest and generate coverage reports
+# Run tests with pytest and generate an HTML coverage report
 test:
 	@echo "🧪 Running tests..."
-	@COVERAGE_FILE=/tmp/.coverage $(RUN) pytest --cov-report=xml --cov-report=html --cov-report=json --cov -n auto -vv tests/
-	@echo "✅ Tests completed!"
-
+	@COVERAGE_FILE=/tmp/.coverage $(RUN) pytest --cov=src --cov-report=html -n auto -vv tests/
 	@echo "📊 Generating coverage badge..."
-	@$(RUN) coverage-badge -o coverage.svg -f || echo "⚠️ Failed to generate badge"
-
-	@echo "📂 Storing coverage reports..."
-	@mkdir -p artifacts
-	@mv coverage.xml artifacts/ || echo "⚠️ No coverage.xml generated"
-	@mv coverage.json artifacts/ || echo "⚠️ No coverage.json generated"
-
-	@echo "✅ Coverage reports are stored in the 'artifacts' directory."
-
+	@COVERAGE_FILE=/tmp/.coverage $(RUN) coverage-badge -o coverage.svg -f
+	@echo "✅ Tests completed, and coverage badge generated!"
 
 # Build documentation
 docs:
