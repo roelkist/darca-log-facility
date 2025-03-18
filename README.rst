@@ -2,16 +2,6 @@
 Darca Log Facility
 ==================================
 
-.. image:: coverage.svg
-   :alt: Test Coverage
-   :target: coverage.svg
-
-.. only:: html
-
-   .. image:: _static/coverage.svg
-      :alt: Test Coverage
-      :target: _static/coverage.svg
-
 Darca Log Facility is a powerful, flexible, and structured logging utility for Python applications.
 It provides configurable logging to both console and file, supports log rotation, and allows 
 optional JSON formatting for structured logging.
