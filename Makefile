@@ -57,13 +57,14 @@ poetry: venv
 
 # Install project dependencies (ensuring Poetry is installed first)
 install: poetry
-ifeq ($(CI),true)
+ifneq ($(GITHUB_ACTIONS),)
 	@echo "🤖 Running inside GitHub Actions - Using system Poetry..."
 	poetry install --no-cache --with dev,docs --no-interaction
 else
 	@echo "📦 Installing dependencies using Poetry..."
 	@$(INSTALL_CMD)
 endif
+
 
 # 🔥 Generic make target for adding dependencies dynamically
 add-deps:
