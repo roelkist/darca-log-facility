@@ -44,5 +44,5 @@ jobs:
       - name: Upload Documentation as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sphinx-docs
+          name: sphinx-docs-${{ matrix.python-version }}
           path: docs/build/html/

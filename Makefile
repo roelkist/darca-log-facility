@@ -34,7 +34,7 @@ ifeq ($(CI),true)
     RUN = poetry run
     INSTALL_CMD = poetry install --no-cache --with dev,docs --no-interaction
 else
-    RUN = $(POETRY_BIN) run
+    RUN = $(RUN_POETRY) run
     INSTALL_CMD = $(RUN_POETRY) install --no-cache --with dev,docs --no-interaction
 endif
 
@@ -61,6 +61,7 @@ ifneq ($(GITHUB_ACTIONS),)
 	@echo "🤖 Running inside GitHub Actions - Using system Poetry..."
 	poetry install --no-cache --with dev,docs --no-interaction
 else
+	@make poetry
 	@echo "📦 Installing dependencies using Poetry..."
 	@$(INSTALL_CMD)
 endif
