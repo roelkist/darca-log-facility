@@ -56,7 +56,7 @@ poetry: venv
 	fi
 
 # Install project dependencies (ensuring Poetry is installed first)
-install: poetry
+install:
 ifneq ($(GITHUB_ACTIONS),)
 	@echo "🤖 Running inside GitHub Actions - Using system Poetry..."
 	poetry install --no-cache --with dev,docs --no-interaction
